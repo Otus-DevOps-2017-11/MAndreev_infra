@@ -37,3 +37,22 @@ host internalhost
 Хост bastion, внешний IP: 35.205.76.161, внутренний IP: 10.132.0.2
 Хост: internalhost, внутренний IP: 10.132.0.3
 ```
+## Homework 6
+#### Manual install:
+* Install Ruby `scripts/install_ruby.sh`
+* Install MongoDB `scripts/install_mongodb.sh`
+* Deploy App `scripts/deploy.sh`
+
+#### Auto install through [Google Cloud Platform](https://cloud.google.com/)
+use this command to install app via google cli:
+```
+gcloud compute instances create reddit-app \
+  --boot-disk-size=10GB \
+  --image-family ubuntu-1604-lts \
+  --image-project=ubuntu-os-cloud \
+  --machine-type=g1-small \
+  --tags puma-server \
+  --restart-on-failure \
+  --zone=europe-west1-d \
+  --metadata startup-script-url=https://raw.githubusercontent.com/Otus-DevOps-2017-11/MAndreev_infra/Infra-2/scripts/startup-script.sh
+```
