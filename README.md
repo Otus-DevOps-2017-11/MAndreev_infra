@@ -54,5 +54,5 @@ gcloud compute instances create reddit-app \
   --tags puma-server \
   --restart-on-failure \
   --zone=europe-west1-d \
-  --metadata startup-script-url=https://raw.githubusercontent.com/Otus-DevOps-2017-11/MAndreev_infra/Infra-2/scripts/startup-script.sh
+  --metadata startup-script-url=https://raw.githubusercontent.com/Otus-DevOps-2017-11/MAndreev_infra/master/startup-script.sh
 ```
