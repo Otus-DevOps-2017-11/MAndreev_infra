@@ -12,6 +12,6 @@ if [ -d $HOME/reddit ]; then
     git clone https://github.com/Otus-DevOps-2017-11/reddit.git
 fi
 
-cd reddit && sudo install
+cd reddit && bundle install
 puma -d
 ps aux | grep puma
