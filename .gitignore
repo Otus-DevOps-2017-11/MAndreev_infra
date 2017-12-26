@@ -1,2 +1,5 @@
 # Mac
 .DS_Store
+
+# Packer vars file
+variables.json

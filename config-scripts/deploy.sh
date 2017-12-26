@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eu
 
 # Prepare to deploy
 sudo apt update
@@ -11,6 +12,6 @@ if [ -d $HOME/reddit ]; then
     git clone https://github.com/Otus-DevOps-2017-11/reddit.git
 fi
 
-cd reddit && bundle install
+cd reddit && sudo install
 puma -d
 ps aux | grep puma
