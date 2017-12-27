@@ -1,0 +1,5 @@
+{
+  "project_id": "your_project_id",
+  "source_image_family": "ubuntu-1604-lts",
+  "machine_type": "g1-small"
+}

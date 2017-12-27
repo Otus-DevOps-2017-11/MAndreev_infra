@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eu
 
 # Prepare to deploy
 sudo apt update

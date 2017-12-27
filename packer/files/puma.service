@@ -1,0 +1,18 @@
+[Unit]
+Description=Reddit
+After=network.target mongod.service
+
+[Service]
+Type=simple
+User=webapp
+Group=webapp
+WorkingDirectory=/home/webapp/reddit
+ExecStart=/usr/local/bin/puma -b tcp://0.0.0.0:9292
+ExecStop=/bin/kill -15 $MAINPID
+Restart=on-failure
+#Environment=REPO_NAME=
+#Environment=SERVER_IP=
+#Environment=DEPLOY_USER=
+
+[Install]
+WantedBy=multi-user.target

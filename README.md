@@ -1,13 +1,13 @@
 # Infra
 ## Homework 5
-#### 1. Пример как подключиться к internalhost через bastion
+#### 1. How to connect internalhost through bastion
 В одну команду:
 ```
 * ssh 10.132.0.3 -o ProxyCommand="ssh -W %h:%p 35.205.76.161"
 * ssh 10.132.0.3 -o ProxyCommand="ssh 35.205.76.161 nc %h %p 2> /dev/null"
 * ssh -J 35.205.76.161 10.132.0.3
 ```
-Используя .ssh/config
+Using .ssh/config
 ```
 Host *
     AddKeysToAgent yes
@@ -22,7 +22,7 @@ host internalhost
     hostname 10.132.0.3
     proxyjump bastion
 ```
-Ещё два, что указаны выше
+Another examples
 ```
 host internalhost
     hostname 10.132.0.3
@@ -32,16 +32,16 @@ host internalhost
     hostname 10.132.0.3
     ProxyCommand ssh bastion nc %h %p 2> /dev/null
 ```
-#### 2. Конфигурация и данные для подключения.
+#### 2. Host configuration.
 ```
 Хост bastion, внешний IP: 35.205.76.161, внутренний IP: 10.132.0.2
 Хост: internalhost, внутренний IP: 10.132.0.3
 ```
 ## Homework 6
 #### Manual install:
-* Install Ruby `scripts/install_ruby.sh`
-* Install MongoDB `scripts/install_mongodb.sh`
-* Deploy App `scripts/deploy.sh`
+* Install Ruby `config-scripts/install_ruby.sh`
+* Install MongoDB `config-scripts/install_mongodb.sh`
+* Deploy App `config-scripts/deploy.sh`
 
 #### Auto install through [Google Cloud Platform](https://cloud.google.com/)
 use this command to install app via google cli:
@@ -54,5 +54,27 @@ gcloud compute instances create reddit-app \
   --tags puma-server \
   --restart-on-failure \
   --zone=europe-west1-d \
-  --metadata startup-script-url=https://raw.githubusercontent.com/Otus-DevOps-2017-11/MAndreev_infra/master/startup-script.sh
+  --metadata-from-file startup-script=config-scripts/startup-script.sh
+```
+## Homework 7
+#### Create image with HashiCorp Packer
+```
+packer build \
+-var-file=variables.json \
+immutable.json
+```
+#### Run reddit app
+Use [Google Cloud Platform](https://cloud.google.com/)
+```
+gcloud compute instances create reddit-app \
+  --boot-disk-size=10GB \
+  --image-family reddit-full \
+  --machine-type=g1-small \
+  --tags puma-server \
+  --restart-on-failure \
+  --zone=europe-west1-d
+```
+or run script
+```
+config-scripts/create-reddit-vm.sh
 ```

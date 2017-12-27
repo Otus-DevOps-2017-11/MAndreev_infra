@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 # Set vars
 USER=webapp
 HOME_DIR=/home/$USER
