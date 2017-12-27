@@ -61,7 +61,7 @@ gcloud compute instances create reddit-app \
 ```
 packer build \
 -var-file=variables.json \
-packer/immutable.json
+immutable.json
 ```
 #### Run reddit app
 Use [Google Cloud Platform](https://cloud.google.com/)

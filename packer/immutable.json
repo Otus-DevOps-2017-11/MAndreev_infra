@@ -24,12 +24,12 @@
   "provisioners": [
     {
       "type": "file",
-      "source": "packer/files/puma.service",
+      "source": "files/puma.service",
       "destination": "/tmp/"
     },
     {
       "type": "shell",
-      "script": "packer/scripts/startup-script.sh",
+      "script": "scripts/startup-script.sh",
       "execute_command": "sudo {{.Path}}"
     },
     {

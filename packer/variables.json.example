@@ -1,5 +1,5 @@
 {
   "project_id": "your_project_id",
   "source_image_family": "ubuntu-1604-lts",
-  "machine_type": "instance_type for expamle g1-small"
+  "machine_type": "g1-small"
 }
