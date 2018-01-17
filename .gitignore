@@ -3,3 +3,10 @@
 
 # Packer vars file
 variables.json
+
+# Terraform
+*.tfstate
+*.tfstate.*.backup
+*.tfstate.backup
+*.tfvars
+.terraform/
