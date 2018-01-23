@@ -104,3 +104,10 @@ Now we separate environment: prod (ssh access from 5.16.0.0/14) and stage (ssh f
 ~/terraform/{prod | stage}$ terraform plan
 ~/terraform/{prod | stage}$ terraform apply
 ```
+- add `storage-bucket.tf`
+
+```bash
+gsutil ls
+gs://storage-bucket-test-93389695/
+gs://storage-bucket-test2-2226613/
+```
