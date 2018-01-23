@@ -111,3 +111,38 @@ gsutil ls
 gs://storage-bucket-test-93389695/
 gs://storage-bucket-test2-2226613/
 ```
+
+## Homework 10
+#### Add ansible to `infra` project
+
+- install ansible
+
+```bash
+brew install ansible
+```
+- add `ansible.cfg`
+
+```bash
+$ cat ansible.cfg
+[defaults]
+inventory = ./inventory
+remote_user = appuser
+private_key_file = ~/.ssh/appuser
+host_key_checking = False
+```
+- add different types for inventory file `inventory`, `inventory.yaml`, `inventory.json`
+- test some commands to test and deploy `reddit-app`
+
+```bash
+ansible dbserver -m command -a uptime
+ansible all -m ping
+ansible all -m ping -i inventory.json
+ansible app -m shell -a 'ruby -v; bundler -v'
+ansible db -m command -a 'systemctl status mongod'
+ansible db -m shell -a 'systemctl status mongod'
+ansible db -m systemd -a name=mongod
+ansible db -m service -a name=mongod
+ansible app -m git -a 'repo=https://github.com/Otus-DevOps-2017-11/reddit.git dest=/home/appuser/reddit'
+ansible app -m command -a 'git clone https://github.com/Otus-DevOps-2017-11/reddit.git dest=/home/appuser/reddit'
+```
+
