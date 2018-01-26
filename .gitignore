@@ -13,4 +13,4 @@ variables.json
 
 # Ansible
 *.retry
-Infra-*.json
+*Infra*.json
