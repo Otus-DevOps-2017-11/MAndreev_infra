@@ -2,7 +2,7 @@
 ## Homework 5
 #### 1. How to connect internalhost through bastion
 
-```
+```bash
 * ssh 10.132.0.3 -o ProxyCommand="ssh -W %h:%p 35.205.76.161"
 * ssh 10.132.0.3 -o ProxyCommand="ssh 35.205.76.161 nc %h %p 2> /dev/null"
 * ssh -J 35.205.76.161 10.132.0.3
@@ -33,7 +33,7 @@ host internalhost
     ProxyCommand ssh bastion nc %h %p 2> /dev/null
 ```
 #### 2. Host configuration.
-```
+```bash
 Хост bastion, внешний IP: 35.205.76.161, внутренний IP: 10.132.0.2
 Хост: internalhost, внутренний IP: 10.132.0.3
 ```
@@ -45,7 +45,7 @@ host internalhost
 
 #### Auto install through [Google Cloud Platform](https://cloud.google.com/)
 use this command to install app via google cli:
-```
+```bash
 gcloud compute instances create reddit-app \
   --boot-disk-size=10GB \
   --image-family ubuntu-1604-lts \
@@ -58,14 +58,14 @@ gcloud compute instances create reddit-app \
 ```
 ## Homework 7
 #### Create image with HashiCorp Packer
-```
+```bash
 packer build \
 -var-file=variables.json \
 immutable.json
 ```
 #### Run reddit app
 Use [Google Cloud Platform](https://cloud.google.com/)
-```
+```bash
 gcloud compute instances create reddit-app \
   --boot-disk-size=10GB \
   --image-family reddit-full \
@@ -75,7 +75,7 @@ gcloud compute instances create reddit-app \
   --zone=europe-west1-d
 ```
 or run script
-```
+```bash
 config-scripts/create-reddit-vm.sh
 ```
 ## Homework 8
@@ -99,6 +99,7 @@ terraform apply # apply the changes required to reach the desired state of the c
 
 Now we separate environment: prod (ssh access from 5.16.0.0/14) and stage (ssh from everywhere) also use modules for each instance `reddit-app` and `reddit-db`
  - build instances
+
 ```bash
 ~/terraform/{prod | stage}$ terraform init
 ~/terraform/{prod | stage}$ terraform plan
@@ -123,7 +124,7 @@ brew install ansible
 - add `ansible.cfg`
 
 ```bash
-$ cat ansible.cfg
+$ cat ansible.cfg 
 [defaults]
 inventory = ./inventory
 remote_user = appuser
@@ -145,4 +146,93 @@ ansible db -m service -a name=mongod
 ansible app -m git -a 'repo=https://github.com/Otus-DevOps-2017-11/reddit.git dest=/home/appuser/reddit'
 ansible app -m command -a 'git clone https://github.com/Otus-DevOps-2017-11/reddit.git dest=/home/appuser/reddit'
 ```
+note: ansible==2.0 can't work with statick json inventory file; only dynamic
 
+## Homework 11
+#### Deploy and CM with [Ansible](https://www.ansible.com)
+###### Todo list
+- Using playbooks, handlers and templates for configuration environment and deploy stage app. One playbook, one script
+- One playbook, several scripts
+- Several playbooks
+- Change provision packer's images from bash scripts to ansible playbooks
+
+###### One playbook, one script
+- we create one playbook for CM at all hosts `reddit_app_one_play.yml`
+- add jinja2 template `mongod.conf` to `templates/`
+- add `puma.service` unit to `files/`
+- add `db_config.j2` to `files/`
+- configure mongod at `reddit-db`
+
+```bash
+ansible-playbook reddit_app.yml --check --limit reddit-db -i inventory/gce.py # check playbook
+ansible-playbook reddit_app.yml --limit reddit-db -i inventory/gce.py # apply playbook 
+```
+- configure `reddit-app` instance
+
+```bash
+ansible-playbook reddit_app.yml --check --limit reddit-app --tags app-tag -i inventory/gce.py # check
+ansible-playbook reddit_app.yml --limit reddit-app --tags app-tag -i inventory/gce.py # apply playbook for reddit-app host with app-tag tag
+```
+- deploy app
+
+```bash
+ansible-playbook reddit_app.yml --check --limit reddit-app --tags deploy-tag -i inventory/gce.py # check 
+ansible-playbook reddit_app.yml --check --limit reddit-app --tags deploy-tag -i inventory/gce.py # deploy reddit-app
+```
+
+###### One playbook, several script
+- create `reddit_app_multiple_plays.yml`
+- apply scripts
+
+```bash
+ansible-playbook reddit_app2.yml --tags db-tag -i inventory/gce.py # apply config db
+ansible-playbook reddit_app2.yml --tags app-tag -i inventory/gce.py # apply config app instance
+ansible-playbook reddit_app2.yml --tags deploy-tag -i inventory/gce.py # deploy app
+```
+
+###### Several playbooks
+- create `db.yml`, `app.yml`, `deploy.yml` and `site.yml`
+
+> `site.yml` is a main playbook which contains other playbooks
+
+```bash
+ansible-playbook site.yml --check # check
+ansible-playbook site.yml # apply config instances and deploy rediit-app
+```
+
+###### Change provision packer's images from bash scripts to ansible playbooks
+- Create `packer_app.yml` and `packer_db.yml`
+- Change provisioners in `packer/app.json` and `packer/db.json`
+
+```bash
+packer build -var-file=packer/variables.json packer/app.json
+packer build -var-file=packer/variables.json packer/db.json
+```
+
+###### Add dynamyc inventory script
+I found only one possibility for getting a dynamic list of hosts [here](http://docs.ansible.com/ansible/latest/intro_dynamic_inventory.html)
+- install apache-libcloud
+
+```bash
+pip install apache-libcloud
+```
+- copy `gce.py` and `gce.ini` from https://github.com/ansible/ansible/tree/devel/contrib/inventory to ansible/inventory directory
+- create a [Service Account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#creatinganaccount)
+- download JSON credential to `ansible/inventory/` 
+- edit gce.ini
+
+```
+gce_service_account_email_address = # Service account email found in ansible json file
+gce_service_account_pem_file_path = # Path to ansible service account json file
+gce_project_id = # Your GCE project name
+```
+- export gce.ini environment variable
+
+```bash
+echo "export GCE_INI_PATH=/Users/maa/Learn/otus/MAndreev_infra/ansible/inventory/gce.ini" >> ~/.zshrc.local
+```
+- check `gce.py` script
+
+```bash
+inventory/gce.py --list | python -m json.tool
+```
