@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Otus-DevOps-2017-11/MAndreev_infra.svg?branch=ansible-3)](https://travis-ci.org/Otus-DevOps-2017-11/MAndreev_infra)
+
 # Infra
 ## Homework 5
 #### 1. How to connect internalhost through bastion
@@ -196,8 +198,8 @@ ansible-playbook reddit_app2.yml --tags deploy-tag -i inventory/gce.py # deploy 
 > `site.yml` is a main playbook which contains other playbooks
 
 ```bash
-ansible-playbook site.yml --check # check
-ansible-playbook site.yml # apply config instances and deploy rediit-app
+ansible-playbook site.yml -i inventory/gce.py --check # check
+ansible-playbook site.yml -i inventory/gce.py # apply config instances and deploy rediit-app
 ```
 
 ###### Change provision packer's images from bash scripts to ansible playbooks
@@ -226,13 +228,16 @@ gce_service_account_email_address = # Service account email found in ansible jso
 gce_service_account_pem_file_path = # Path to ansible service account json file
 gce_project_id = # Your GCE project name
 ```
-- export gce.ini environment variable
-
-```bash
-echo "export GCE_INI_PATH=/Users/maa/Learn/otus/MAndreev_infra/ansible/inventory/gce.ini" >> ~/.zshrc.local
-```
 - check `gce.py` script
 
 ```bash
 inventory/gce.py --list | python -m json.tool
 ```
+
+## Homework 12
+#### [Ansible](https://www.ansible.com): working with roles and evironment
+- move playbooks to separate roles
+- create prod and stage environment
+- using jdauphant.nginx role
+
+

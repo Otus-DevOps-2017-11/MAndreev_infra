@@ -1,0 +1,9 @@
+---
+- name: Configure App
+  hosts: 
+    - reddit-app
+    - app
+  become: true
+  roles:
+    - app
+    - jdauphant.nginx

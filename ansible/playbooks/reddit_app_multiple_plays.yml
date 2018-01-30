@@ -1,6 +1,8 @@
 ---
 - name: Configure MongoDB
-  hosts: reddit-db
+  hosts: 
+    - reddit-db
+    - db
   tags: db-tag
   become: true
   vars:
@@ -19,7 +21,9 @@
 
 
 - name: Configure App
-  hosts: rediit-app
+  hosts: 
+    - rediit-app
+    - app
   tags: app-tag
   become: true
   vars:
@@ -47,7 +51,9 @@
 
 
 - name: Deploy App
-  hosts: reddit-app
+  hosts: 
+    - reddit-app
+    - app
   tags: deploy-tag
   tasks:
     - name: Fetch the latest version of application code
