@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Otus-DevOps-2017-11/MAndreev_infra.svg?branch=ansible-3)](https://travis-ci.org/Otus-DevOps-2017-11/MAndreev_infra)
+
 # Infra
 ## Homework 5
 #### 1. How to connect internalhost through bastion
@@ -196,8 +198,8 @@ ansible-playbook reddit_app2.yml --tags deploy-tag -i inventory/gce.py # deploy 
 > `site.yml` is a main playbook which contains other playbooks
 
 ```bash
-ansible-playbook site.yml --check # check
-ansible-playbook site.yml # apply config instances and deploy rediit-app
+ansible-playbook site.yml -i inventory/gce.py --check # check
+ansible-playbook site.yml -i inventory/gce.py # apply config instances and deploy rediit-app
 ```
 
 ###### Change provision packer's images from bash scripts to ansible playbooks
@@ -226,13 +228,88 @@ gce_service_account_email_address = # Service account email found in ansible jso
 gce_service_account_pem_file_path = # Path to ansible service account json file
 gce_project_id = # Your GCE project name
 ```
-- export gce.ini environment variable
-
-```bash
-echo "export GCE_INI_PATH=/Users/maa/Learn/otus/MAndreev_infra/ansible/inventory/gce.ini" >> ~/.zshrc.local
-```
 - check `gce.py` script
 
 ```bash
 inventory/gce.py --list | python -m json.tool
 ```
+
+## Homework 12
+#### [Ansible](https://www.ansible.com): working with roles and evironment
+- move playbooks to separate roles
+- create prod and stage environment
+- using jdauphant.nginx role
+- using dynamic inventory for ansible
+- add [TravisCI](https://travis-ci.org) commits check
+
+#### Roles
+- create roles `app` and `db`
+
+```bash
+ansible-galaxy init app
+ansible-galaxy init db
+```
+- move `tasks`, `handlers`, `templates` and `files` to roles 
+- add variables to `roles/{db | app}/defaults/main.yml `
+- add roles to `app.yml` and `db.yml`
+
+#### Environments
+- move `inventory` to `environtents/{stage | prod}`
+- add default inventory file, `roles_path` and enable diff to `ansible.cfg`
+
+```
+[defaults]
+inventory = ./environments/stage/gce.py
+remote_user = appuser
+private_key_file = ~/.ssh/appuser
+host_key_checking = False
+roles_path = ./roles
+retry_files_enabled = False
+
+[diff]
+always = True
+context = 5
+```
+- create `grop_vars` dir into environments/{stage | prod}
+- add move variables from playbooks to `environments/{stage | prod}/group_vars/{app | db}`
+> for dynamic inventory  should use `tag_reddit-app` and `tag_reddit-db`
+- add env var to `{stage | prod}/group_vars/all`
+
+```
+env: prod
+env: stage
+```
+- add info about environment into `roles/{app | db}/tasks/main.yml`
+
+```yml
+---
+# tasks file for app
+- name: Show info about the env this host belongs to
+  debug:
+  msg: "This host is in {{ env }} environment"
+```
+- move all playbooks to `ansible/playbooks`
+- move other files to `ansible/old`
+
+#### Using community role `jdauphant.nginx`
+- add requirements environments/{stage | prod}/requirements.yml`
+- install `jdauphant.nginx` role 
+
+```
+ansible-galaxy install -r environments/stage/requirements.yml
+```
+- add `nginx` viriables to proxy `environments/{stage | prod}/group_vars/app`
+- change port from 9292 to 80 in terraform app module `terraform/modules/app/main.tf`
+- add `jdauphant.nginx` to `app.yml`
+- check instances
+
+```
+terraform init
+terraform destroy
+terraform apply -auto-approve=false
+ansible-playbook playbooks/site.yml --check
+ansible-playbook playbooks/site.yml
+```
+> before `terraform init` should remove `.terrafrom` directory
+
+- add `.travis.yml` to check commits
