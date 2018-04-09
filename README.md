@@ -313,3 +313,8 @@ ansible-playbook playbooks/site.yml
 > before `terraform init` should remove `.terrafrom` directory
 
 - add `.travis.yml` to check commits
+
+## Homework 13
+- learn ansible roles test with vagrant, molecula, testinfra
+- add Vagrantfile for deploy add
+- add mongo_db test

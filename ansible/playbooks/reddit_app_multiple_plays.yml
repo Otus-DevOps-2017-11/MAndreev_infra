@@ -1,6 +1,6 @@
 ---
 - name: Configure MongoDB
-  hosts: 
+  hosts:
     - reddit-db
     - db
   tags: db-tag
@@ -19,9 +19,8 @@
   - name: restart mongod
     service: name=mongod state=restarted
 
-
 - name: Configure App
-  hosts: 
+  hosts:
     - rediit-app
     - app
   tags: app-tag
@@ -49,9 +48,8 @@
   - name: reload puma
     systemd: name=puma state=reloaded
 
-
 - name: Deploy App
-  hosts: 
+  hosts:
     - reddit-app
     - app
   tags: deploy-tag

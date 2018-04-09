@@ -17,3 +17,10 @@ variables.json
 
 #Nginx role
 jdauphant.nginx
+
+# Vagrant & molecule
+.vagrant/
+*.log
+*.pyc
+.molecule
+.cache
