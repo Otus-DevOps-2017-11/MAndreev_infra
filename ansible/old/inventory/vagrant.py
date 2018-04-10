@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Vagrant external inventory script. Automatically finds the IP of the booted vagrant vm(s), and
 returns it under the host group 'vagrant'
